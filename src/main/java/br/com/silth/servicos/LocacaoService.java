@@ -3,6 +3,8 @@ package br.com.silth.servicos;
 import java.util.Date;
 import java.util.List;
 
+import br.com.silth.dao.LocacaoDao;
+import br.com.silth.dao.LocacaoDaoImpl;
 import br.com.silth.entidades.Filme;
 import br.com.silth.entidades.Locacao;
 import br.com.silth.entidades.Usuario;
@@ -14,6 +16,12 @@ import org.junit.Test;
 
 public class LocacaoService {
 
+    private LocacaoDao locacaoDao;
+
+    private SPCService spcService;
+
+    private EmailService emailService;
+
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmeSemEstoqueException, LocadoraException {
 
         if (filmes == null || filmes.isEmpty()) {
@@ -22,6 +30,10 @@ public class LocacaoService {
 
         if (usuario == null || usuario.getNome() == null || usuario.getNome().isEmpty()) {
             throw new LocadoraException("Usuario vazio");
+        }
+
+        if(spcService.usuarioInadimplente(usuario)){
+            throw new LocadoraException("Usuario Inadimplente");
         }
 
         Double valorTotal =0d;
@@ -64,11 +76,19 @@ public class LocacaoService {
         dataEntrega = DataUtils.adicionarDias(dataEntrega, 1);
         locacao.setDataRetorno(dataEntrega);
 
-        //Salvando a locacao...
-        //TODO adicionar método para salvar
+        locacaoDao.salvar(locacao);
 
         return locacao;
     }
 
+    public void notificarAtrasados(){
+        List<Locacao> locacaoList = locacaoDao.obterLocacoesPendentes();
 
+        for (Locacao locacao :
+                locacaoList) {
+            if(locacao.getDataRetorno().before(new Date())) {
+                emailService.notificarAtraso(locacao.getUsuario());
+            }
+        }
+    }
 }

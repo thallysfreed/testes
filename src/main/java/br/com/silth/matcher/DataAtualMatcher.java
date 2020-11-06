@@ -4,6 +4,8 @@ import br.com.silth.utils.DataUtils;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DataAtualMatcher extends TypeSafeMatcher<Date> {
@@ -20,6 +22,7 @@ public class DataAtualMatcher extends TypeSafeMatcher<Date> {
 
     @Override
     public void describeTo(Description description) {
-
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY");
+        description.appendText("--> " + dateFormat.format(data));
     }
 }

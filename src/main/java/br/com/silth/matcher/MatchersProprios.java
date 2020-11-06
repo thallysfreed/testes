@@ -18,6 +18,10 @@ public class MatchersProprios {
         return new DataAtualMatcher(date);
     }
 
+    public static DataAtualMatcher eHojeComDiferencaDias(Integer dias){
+        return new DataAtualMatcher(DataUtils.adicionarDias(new Date(), dias));
+    }
+
     public static DataAtualMatcher eAmanha(Date date){
         return new DataAtualMatcher(DataUtils.adicionarDias(date, 1));
     }

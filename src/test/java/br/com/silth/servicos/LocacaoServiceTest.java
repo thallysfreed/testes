@@ -17,10 +17,7 @@ import org.hamcrest.CoreMatchers.*;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.verification.VerificationMode;
 
 import java.util.Arrays;
@@ -181,7 +178,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void deveLancarExpceptionUsuarioInadimplente() throws FilmeSemEstoqueException {
+    public void deveLancarExpceptionUsuarioInadimplente() throws FilmeSemEstoqueException, Exception {
         List<Filme> filmes = Arrays.asList(FilmeBuilder.umFilme().agora());
         Usuario usuario = UsuarioBuilder.umUsuario().agora();
 
@@ -217,6 +214,36 @@ public class LocacaoServiceTest {
         Mockito.verify(emailService).notificarAtraso(usuario2);
         Mockito.verify(emailService, Mockito.atLeastOnce()).notificarAtraso(usuario3);
         Mockito.verifyNoMoreInteractions(emailService);
+    }
+
+    @Test
+    public void deveTratarErroNoSPC() throws Exception {
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(FilmeBuilder.umFilme().agora());
+
+        Mockito.when(spcService.usuarioInadimplente(usuario)).thenThrow(new Exception("Falha catastrófica"));
+
+        expectedException.expect(LocadoraException.class);
+        expectedException.expectMessage("Problemas com SPC, tente novamente");
+
+        service.alugarFilme(usuario, filmes);
+    }
+
+    @Test
+    public void deveProrrogarLocacao(){
+        Locacao locacao = LocacaoBuilder.umLocacao().agora();
+
+        service.provogarLocacao(locacao, 3);
+
+        ArgumentCaptor<Locacao> argumentCaptor = ArgumentCaptor.forClass(Locacao.class);
+        Mockito.verify(locacaoDao).salvar(argumentCaptor.capture());
+
+        Locacao locacaoRetornada = argumentCaptor.getValue();
+
+        errorCollector.checkThat(locacaoRetornada.getValor(), is(12.0));
+        errorCollector.checkThat(locacaoRetornada.getDataLocacao(), MatchersProprios.eHoje(locacaoRetornada.getDataLocacao()));
+        errorCollector.checkThat(locacaoRetornada.getDataRetorno(), MatchersProprios.eHojeComDiferencaDias(3));
+
     }
 //    @Test
 //    public void testrLocacao_filmeSemEstoque_2() {

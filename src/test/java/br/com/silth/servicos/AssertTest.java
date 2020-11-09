@@ -28,7 +28,7 @@ public class AssertTest {
 
         Assert.assertEquals(u1,u2);
         Assert.assertSame(u2,u2);
-        Assert.assertNotSame(u2,u2);
+        Assert.assertNotSame(u2,u3);
         Assert.assertNull(u3);
         Assert.assertNotNull(u2);
     }

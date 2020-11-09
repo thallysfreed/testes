@@ -29,7 +29,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.*;
 
 
-@RunWith(ParallelRunner.class)
+//@RunWith(ParallelRunner.class)
 public class LocacaoServiceTest {
 
     @Rule
@@ -63,14 +63,10 @@ public class LocacaoServiceTest {
     @Before
     public void setup(){
         MockitoAnnotations.initMocks(this);
-        //service = PowerMockito.spy(service);
-
-        System.out.println("Begin");
     }
 
     @After
     public void destroy(){
-        System.out.println("End");
     }
 
     @Test

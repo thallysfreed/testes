@@ -1,5 +1,6 @@
 package br.com.silth.servicos;
 
+import br.com.silth.dao.LocacaoDao;
 import br.com.silth.entidades.Filme;
 import br.com.silth.entidades.Locacao;
 import br.com.silth.entidades.Usuario;
@@ -10,6 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +27,17 @@ import static org.hamcrest.CoreMatchers.is;
 @RunWith(Parameterized.class)
 public class CalculoValorLocacaoTest {
 
+    @InjectMocks
     private LocacaoService service;
+
+    @Mock
+    private SPCService spcService;
+
+    @Mock
+    private LocacaoDao locacaoDao;
+
+    @Mock
+    private EmailService emailService;
 
     @Parameterized.Parameter
     public List<Filme> filmes;
@@ -32,7 +47,7 @@ public class CalculoValorLocacaoTest {
 
     @Before
     public void setup() {
-        service = new LocacaoService();
+        MockitoAnnotations.initMocks(this);
     }
 
     private static Filme filme = new Filme("Filme 1", 2, 10.0);
